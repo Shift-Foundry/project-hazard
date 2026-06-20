@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ShiftXRCore — Android XR manifest injection (UPL).
+
+  Referenced from ShiftXRCore.Build.cs via:
+      AdditionalPropertiesForReceipt.Add("AndroidPlugin", ".../ShiftXRCore_UPL_Android.xml")
+
+  bPackageForOpenXRImmersive already injects the Khronos immersive *intent category*;
+  this UPL adds the manifest-root nodes UE can't add through ExtraApplicationSettings
+  (which only writes inside <application>): the Android XR OpenXR *feature* and the
+  XR runtime *permissions / hardware features*.
+-->
+<root xmlns:android="http://schemas.android.com/apk/res/android">
+
+  <init>
+    <log text="ShiftXRCore UPL: injecting Android XR feature + hand-tracking permission" />
+  </init>
+
+  <androidManifestUpdates>
+    <addElements tag="manifest">
+      <!-- Marks the app as an Android XR (OpenXR) immersive title. Required=true so the
+           Android XR runtime / store recognise it as immersive (not a 2D-panel app). -->
+      <uses-feature android:name="android.software.xr.api.openxr" android:required="true" android:version="1" />
+
+      <!-- Hand tracking is the primary on-device input today (pinch=fire, swing=melee).
+           The permission is runtime-granted (dangerous) — also request it at runtime in C++. -->
+      <uses-permission android:name="android.permission.HAND_TRACKING" />
+      <uses-feature android:name="android.hardware.xr.input.hand_tracking" android:required="false" />
+
+      <!-- Reserved for when the corresponding backends go live (kept commented so the
+           manifest stays minimal and we don't request permissions we don't yet use):
+      <uses-permission android:name="android.permission.EYE_TRACKING_FINE" />
+      <uses-permission android:name="android.permission.SCENE_UNDERSTANDING_COARSE" />
+      <uses-permission android:name="android.permission.SCENE_UNDERSTANDING_FINE" />
+      -->
+    </addElements>
+  </androidManifestUpdates>
+
+</root>

@@ -1,0 +1,41 @@
+# Unreal Engine project .gitignore
+
+# Build / generated output
+Binaries/
+DerivedDataCache/
+Intermediate/
+Saved/
+Build/
+
+# IDE / tooling
+.vs/
+.vscode/
+.idea/
+*.sln
+*.suo
+*.sdf
+*.opensdf
+*.VC.db
+*.VC.opendb
+
+# Compiled binaries
+*.dll
+*.exe
+*.lib
+*.pdb
+*.so
+*.dylib
+
+# OS noise
+Thumbs.db
+.DS_Store
+
+# Local tooling / IDE artifacts
+.claude/
+.mcp.json
+
+# Keep these explicitly tracked (negate broad ignores if needed):
+!Plugins/**/Source/
+!Config/
+!Content/
+!Scripts/

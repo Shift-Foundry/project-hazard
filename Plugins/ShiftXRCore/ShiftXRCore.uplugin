@@ -1,0 +1,25 @@
+{
+	"FileVersion": 3,
+	"Version": 1,
+	"VersionName": "0.1",
+	"FriendlyName": "ShiftXRCore",
+	"Description": "Shift Foundry reusable XR core: hand interaction, scene anchors, and a performance governor. Built for Android XR with Meta Quest baseline compatibility.",
+	"Category": "XR",
+	"CreatedBy": "Shift Foundry",
+	"CreatedByURL": "https://github.com/Shift-Foundry/project-hazard",
+	"DocsURL": "",
+	"MarketplaceURL": "",
+	"SupportURL": "",
+	"CanContainContent": false,
+	"IsBetaVersion": true,
+	"IsExperimentalVersion": false,
+	"Installed": false,
+	"Modules": [
+		{
+			"Name": "ShiftXRCore",
+			"Type": "Runtime",
+			"LoadingPhase": "PreDefault",
+			"PlatformAllowList": [ "Win64", "Android", "Linux", "Mac" ]
+		}
+	]
+}
