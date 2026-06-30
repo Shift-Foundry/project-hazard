@@ -1,0 +1,31 @@
+Hazard — Source-Available License
+Copyright (c) 2026 Shift Foundry. All rights reserved.
+
+This repository and its contents (the "Software") are made publicly available by
+Shift Foundry for evaluation, reference, and review only.
+
+YOU MAY:
+  - View, read, and clone this repository to evaluate or review the work.
+
+YOU MAY NOT, without prior written permission from Shift Foundry:
+  - Use the Software, in whole or in part, in any product, project, or service;
+  - Copy, modify, merge, publish, distribute, sublicense, or sell copies of the
+    Software or any derivative works of it;
+  - Remove, obscure, or alter this notice or any copyright notices.
+
+THIRD-PARTY COMPONENTS
+  The Software is built on and references third-party software and assets —
+  including Unreal Engine, fonts, and other dependencies — which are not covered
+  by this license and remain governed by their own respective licenses and terms
+  (for Unreal Engine, the Unreal Engine End User License Agreement).
+
+NO WARRANTY
+  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+  FITNESS FOR A PARTICULAR PURPOSE, AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES, OR OTHER
+  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT, OR OTHERWISE, ARISING FROM,
+  OUT OF, OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+  SOFTWARE.
+
+For licensing inquiries, contact Shift Foundry at https://shift-foundry.com.

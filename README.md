@@ -1,29 +1,74 @@
-# HAZARD | TECHNICAL PREVIEW
+# Hazard
 
-Room-scale mixed-reality roguelite survivor for **Android XR** (XREAL Project Aura; Samsung Galaxy XR
-as a second target profile), built in **Unreal Engine 5.8**, C++-first, server-authoritative.
-Studio: Shift Foundry.
+**Room-scale mixed-reality roguelite for Android XR glasses.** The dead rise through your real
+walls and floor; you hold the line bare-handed, defend a base anchored to a real surface, and push
+deeper every run. Built in **Unreal Engine 5.8**, C++-first, server-authoritative.
 
-Originally written against UE 5.6 and migrated to 5.8 after 5.8 shipped, to stay on the current engine
-branch. That migration is why the git history is short relative to the amount of code.
+![Unreal Engine 5.8](https://img.shields.io/badge/Unreal%20Engine-5.8-0E1128)
+![C++](https://img.shields.io/badge/C%2B%2B-17-00599C)
+![Android XR](https://img.shields.io/badge/Android%20XR-OpenXR-3DDC84)
+![Status: technical preview](https://img.shields.io/badge/status-technical%20preview-D93A2B)
+[![License: source-available](https://img.shields.io/badge/license-source--available-6E6E6E)](LICENSE)
+
+> **Technical preview.** This is an honest, in-progress build. It runs today on flat-screen PC and in
+> headless validation runs; it has **not** yet run on a headset. The [roadmap](#roadmap-to-on-device)
+> tracks exactly what is done, what is partial, and what still needs the device — nothing here is
+> claimed as device-verified unless it says so.
+
+*Studio: [Shift Foundry](https://shift-foundry.com) — a small Japan-based studio building mixed-reality
+games for Android XR. The repo was rebuilt from a UE 5.6 prototype when 5.8 shipped, so the commit
+history is short by design.*
+
+<!-- A short flat-screen gameplay capture goes here once recorded — motion shows the loop best. -->
+
+## Contents
+
+- [Status](#status)
+- [Engineering highlights](#engineering-highlights)
+- [Build](#build) · [Run](#run-flat-screen-no-headset) · [Verify](#verify-headless)
+- [What's implemented](#whats-implemented)
+- [Known limitations / not done](#known-limitations--not-done)
+- [Architecture](#architecture)
+- [Roadmap to on-device](#roadmap-to-on-device)
+- [Engine gap](#engine-gap)
+- [License](#license)
 
 ## Status
 
 | | |
 |---|---|
-| **Runs today** | Flat-screen PC (WASD + mouse) in PIE/standalone; headless `-game -nullrhi` validation. |
+| **Runs today** | Flat-screen PC (WASD + mouse) in PIE / standalone; headless `-game -nullrhi` validation. |
 | **Not run yet** | On any headset. The project has **never been cooked, packaged, or launched on a device** — no XREAL Aura / Galaxy XR hardware here. So anything device-specific (passthrough, foveation, controller/hand input bindings, on-device framerate) is **unverified**. |
-| **Co-op** | Works as a listen-server in PIE multi-client. Same-room colocation does **not** work (see Limitations). |
+| **Co-op** | Works as a listen-server in PIE multi-client. Same-room colocation does **not** work (see [Engine gap](#engine-gap)). |
 
 When this README says a system is "validated," it means **it builds and behaves correctly in flat-PC
 or headless runs** — not that it's been confirmed on a headset. The two are kept separate on purpose.
 
+## Engineering highlights
+
+- **Server-authoritative from the ground up** — replication, validated server RPCs, and an OnRep-driven
+  HUD, so co-op is a built-in property rather than a retrofit.
+- **Mobile-lean render path** tuned for wearable glasses: forward shading, MultiView, Instanced Stereo;
+  Lumen / Virtual Shadow Maps / ray tracing / Substrate / distance fields all off.
+- **Performance governor** (`UShiftXRPerfGovernor`): live enemy + VFX budgets and a `vr.PixelDensity`
+  lever, built for the thermal and framerate envelope that hand-worn hardware demands.
+- **Pooled projectiles and pooled VFX** — no per-shot allocations on the hot path.
+- **Scene-backend abstraction** (`IShiftSceneBackend` behind a `#if WITH_ANDROIDXR` gate): the real
+  Android XR anchor backend drops in as a fill-in, not a rewrite — see [Engine gap](#engine-gap).
+- **Data-driven combat**: weapons with rarity + a crit/affix system, an in-run RNG roller, chests as
+  case-rolls, and persistent meta-progression via SaveGame.
+- **Reproducible headless validation**: boots a map with `-nullrhi`, auto-fires / auto-picks, and logs
+  what each system actually did — a lightweight regression net.
+- **Content authored headlessly** via Python editor scripting; Blueprints are data shells only, all
+  gameplay logic lives in C++.
+
 ## Build
 
-UE 5.8 at `C:\Games\UE_5.8`, Visual Studio 2022/2026 (C++ game workload). Editor must be closed:
+UE 5.8 + Visual Studio 2022/2026 (C++ game workload). Close the editor first, then from the repo root
+(replace `<UE_5.8>` with your engine path):
 
 ```
-"C:\Games\UE_5.8\Engine\Build\BatchFiles\Build.bat" HazardEditor Win64 Development -Project="C:\UnrealProjects\Hazard\Hazard.uproject" -WaitMutex
+"<UE_5.8>\Engine\Build\BatchFiles\Build.bat" HazardEditor Win64 Development -Project="Hazard.uproject" -WaitMutex
 ```
 
 Targets use `BuildSettingsVersion.V7` (V5 fails against an installed engine). More build/headless
@@ -38,11 +83,11 @@ Open the project and PIE `Content/Hazard/Maps/L_MainMenu`, or launch a level dir
 - **Esc / P** pause, **R** restart (on game over), **M** main menu
 - Main menu: `1` PC room, `2` arena, `6` Shop, `3` settings, `4` quit
 
-The menu and shop are keyboard-driven for now (see Limitations).
+The menu and shop are keyboard-driven for now (see [Known limitations](#known-limitations--not-done)).
 
 ## Verify (headless)
 
-Run from **PowerShell** (git-bash mangles `/Game/...` paths), read `Saved/Logs/Hazard.log`:
+Run from **PowerShell** (git-bash mangles `/Game/...` paths), then read `Saved/Logs/Hazard.log`:
 
 ```
 UnrealEditor-Cmd.exe Hazard.uproject /Game/Hazard/Maps/L_HazardArena -game -unattended -nullrhi -nosound -FORCELOGFLUSH -ExecCmds="hazard.AutoFire 1"
@@ -89,7 +134,7 @@ XR / platform plumbing (configured, **not** device-tested):
   exists but needs the Android SDK/NDK and a device to exercise.
 - **No real spatial features.** UE 5.8 has no Android XR scene/anchor API (Google's plugin is 5.6),
   so anchors, scene mesh, depth occlusion, and same-room colocation run on a stub. Co-op is
-  networked, **not** same-room colocated. See [Engine-gap](#engine-gap).
+  networked, **not** same-room colocated. See [Engine gap](#engine-gap).
 - **Menu/shop are keyboard-only.** XR controller/gesture menu navigation isn't wired.
 - **Passthrough not requested**, foveation path not confirmed for the Google runtime, controller aim-pose
   and runtime permission grants not verified — all need the headset.
@@ -163,7 +208,7 @@ Status legend: ✅ implemented + builds + flat/headless-validated (NOT device-ve
 | 4.3 | Boundary / play-space safety | 🔒 |
 | 4.4 | Articulated hand mesh, binaural audio, polish | ⬜ |
 
-## Engine-gap
+## Engine gap
 
 UE 5.8 has no official Android XR scene/anchor API — Google's Unreal plugin targets 5.6. So real anchors,
 scene mesh, depth occlusion, and same-room colocation have no built-in binding yet. The project is shaped
@@ -182,6 +227,9 @@ Per feature: anchors are the easiest to bridge; scene mesh + depth occlusion nee
 same-room colocation needs shared/cloud anchors (often vendor-specific) and may fall back to marker/QR
 alignment. Until then, co-op stays networked-only.
 
-## License / status
+## License
 
-Work in progress, internal. Greybox art. Not yet shipped or device-tested.
+Source-available, all rights reserved — see [LICENSE](LICENSE). The code is public for evaluation and
+review; it is **not** licensed for reuse or redistribution, and third-party components (Unreal Engine,
+fonts, etc.) remain under their own terms. Greybox art; not yet shipped or device-tested.
+© 2026 Shift Foundry.
