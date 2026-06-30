@@ -29,6 +29,7 @@ history is short by design.*
 - [What's implemented](#whats-implemented)
 - [Known limitations / not done](#known-limitations--not-done)
 - [Architecture](#architecture)
+- [Repository scope](#repository-scope)
 - [Roadmap to on-device](#roadmap-to-on-device)
 - [Engine gap](#engine-gap)
 - [License](#license)
@@ -150,6 +151,17 @@ XR / platform plumbing (configured, **not** device-tested):
 - `Scripts/` — headless Python that authors editor content (materials, meshes, BPs, levels). Blueprints
   are data shells only; no graph logic.
 - Details + operational gotchas: [DESIGN.md](DESIGN.md), [DEVNOTES.md](DEVNOTES.md).
+
+## Repository scope
+
+This is the project's source, kept honest about what's here and what isn't. Not included:
+
+- Signing keys and build secrets (keystores, tokens) — never committed.
+- Third-party / licensed content that can't be redistributed (engine content, fonts, purchased assets) — see [LICENSE](LICENSE).
+- Cooked / binary build artifacts.
+- Final art — the build is greybox; production assets are in progress.
+
+Some internal tooling and work-in-progress systems also live outside this public preview.
 
 ## Roadmap to on-device
 
